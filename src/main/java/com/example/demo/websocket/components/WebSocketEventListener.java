@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import com.example.demo.websocket.constant.WebSocketConstant;
 import com.example.demo.websocket.entities.ChatMessage;
 import com.example.demo.websocket.enums.MessageType;
 
@@ -28,7 +29,7 @@ public class WebSocketEventListener {
 	@EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
+        String username = (String) headerAccessor.getSessionAttributes().get(WebSocketConstant.WebSocketEventListenerConstants.USERNAME);
         
         if (username != null) {
             log.info("user disconnected: {}", username);
@@ -38,7 +39,9 @@ public class WebSocketEventListener {
                     .sender(username)
                     .build();
             
-            messageSendingOperations.convertAndSend("/topic/public", chatMessage);
+            messageSendingOperations.convertAndSend(WebSocketConstant.WebSocketEventListenerConstants.TOPIC_PUBLIC, chatMessage);
+        }else {
+            log.warn("A user disconnected but no username was found in session attributes. Session ID: {}", headerAccessor.getSessionId());
         }
     }
 }

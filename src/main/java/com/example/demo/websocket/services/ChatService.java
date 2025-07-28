@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.websocket.constant.WebSocketConstant;
 import com.example.demo.websocket.entities.ChatMessage;
 import com.example.demo.websocket.entities.Room;
 import com.example.demo.websocket.repository.RoomRepository;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,9 +17,9 @@ public class ChatService {
 	
 	private final RoomRepository roomRepository;
 	
-	public ChatMessage sendMessage(String roomId,ChatMessage chatMessage) throws Exception {
+	public ChatMessage sendMessage(String roomId,ChatMessage chatMessage) {
 		System.out.println(roomId);
-		Room room = roomRepository.findByRoomId(roomId).orElseThrow(() -> new Exception("Room not found"));
+		Room room = roomRepository.findByRoomId(roomId).orElseThrow();
 		
 		ChatMessage message = ChatMessage.builder()
 				.messageType(chatMessage.getMessageType())

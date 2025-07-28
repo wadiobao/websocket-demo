@@ -10,35 +10,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.websocket.constant.WebSocketConstant;
+import com.example.demo.websocket.payload.RoomRequest;
 import com.example.demo.websocket.services.RoomService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/room")
+@RequestMapping(WebSocketConstant.RoomControllerConstants.ROOM_ENDPOINT)
 @RequiredArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin
 public class RoomController {
 
 	private final RoomService roomService;
 	
-	@PostMapping("/create")
-	public ResponseEntity<?> createRoom(@RequestBody String roomId){
+	@PostMapping(WebSocketConstant.RoomControllerConstants.CREATE_ROOM_ENDPOINT)
+	public ResponseEntity<?> createRoom(@NotBlank @RequestParam String roomId) {
 		return roomService.createRoom(roomId);
 	}
 	
-	@PostMapping("/{roomId}")
-	public ResponseEntity<?> joinRoom(@PathVariable("roomId") String roomId){
-		return roomService.joinRoom(roomId);
+	@PostMapping(WebSocketConstant.RoomControllerConstants.JOIN_ROOM_ENDPOINT)
+	public ResponseEntity<?> joinRoom(@Valid @RequestBody RoomRequest roomRequest) {
+		return roomService.joinRoom(roomRequest);
 	}
 
-	@GetMapping("/{roomId}/messages")
+	@GetMapping(WebSocketConstant.RoomControllerConstants.MESSAGES_ENDPOINT)
 	public ResponseEntity<?> getMessages(
-	    @PathVariable("roomId") String roomId,
-	    @RequestParam(defaultValue = "0") int page,
-	    @RequestParam(defaultValue = "20") int size
+	    @PathVariable(WebSocketConstant.RoomControllerConstants.ROOM_ID_PATH_VARIABLE) String roomId,
+	    @RequestParam(defaultValue = WebSocketConstant.RoomControllerConstants.PAGE_DEFAULT_VALUE) int page,
+	    @RequestParam(defaultValue = WebSocketConstant.RoomControllerConstants.SIZE_DEFAULT_VALUE) int size
 	) {
 	    return roomService.getMessage(roomId, page, size);
+	}
+	
+	@GetMapping(WebSocketConstant.RoomControllerConstants.ALL_ROOMS_ENDPOINT)
+	public ResponseEntity<?> getAll(){
+		return roomService.getAll();
 	}
 	
 }
