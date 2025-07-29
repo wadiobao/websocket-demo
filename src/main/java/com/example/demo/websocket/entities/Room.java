@@ -25,8 +25,6 @@ public class Room {
 	private String roomId;	
 	private boolean locked;
 	private String secretKey;
-	@Builder.Default
-	private List<ChatMessage> messages = new ArrayList<ChatMessage>();
 	@Default
 	private List<String> allowedUser = new ArrayList<String>();
 }

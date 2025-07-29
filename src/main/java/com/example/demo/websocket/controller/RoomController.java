@@ -10,44 +10,91 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.websocket.constant.WebSocketConstant;
-import com.example.demo.websocket.payload.RoomRequest;
 import com.example.demo.websocket.services.RoomService;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(WebSocketConstant.RoomControllerConstants.ROOM_ENDPOINT)
+@RequestMapping("/room")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin("*")
 public class RoomController {
 
 	private final RoomService roomService;
 	
-	@PostMapping(WebSocketConstant.RoomControllerConstants.CREATE_ROOM_ENDPOINT)
-	public ResponseEntity<?> createRoom(@NotBlank @RequestParam String roomId) {
+	@PostMapping("/create")
+	public ResponseEntity<?> createRoom(@RequestBody String roomId){
 		return roomService.createRoom(roomId);
 	}
 	
-	@PostMapping(WebSocketConstant.RoomControllerConstants.JOIN_ROOM_ENDPOINT)
-	public ResponseEntity<?> joinRoom(@Valid @RequestBody RoomRequest roomRequest) {
-		return roomService.joinRoom(roomRequest);
+	@PostMapping("/{roomId}")
+	public ResponseEntity<?> joinRoom(@PathVariable("roomId") String roomId){
+		return roomService.joinRoom(roomId);
 	}
 
-	@GetMapping(WebSocketConstant.RoomControllerConstants.MESSAGES_ENDPOINT)
-	public ResponseEntity<?> getMessages(
-	    @PathVariable(WebSocketConstant.RoomControllerConstants.ROOM_ID_PATH_VARIABLE) String roomId,
-	    @RequestParam(defaultValue = WebSocketConstant.RoomControllerConstants.PAGE_DEFAULT_VALUE) int page,
-	    @RequestParam(defaultValue = WebSocketConstant.RoomControllerConstants.SIZE_DEFAULT_VALUE) int size
+	// Lấy tin nhắn theo ngày hiện tại
+	@GetMapping("/today/messages")
+	public ResponseEntity<?> getTodayMessages(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "20") int size
 	) {
-	    return roomService.getMessage(roomId, page, size);
+		return roomService.getTodayMessages(page, size);
 	}
 	
-	@GetMapping(WebSocketConstant.RoomControllerConstants.ALL_ROOMS_ENDPOINT)
-	public ResponseEntity<?> getAll(){
-		return roomService.getAll();
+	// Lấy tin nhắn theo ngày cụ thể
+	@GetMapping("/date/{date}/messages")
+	public ResponseEntity<?> getMessagesByDate(
+		@PathVariable("date") String date,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "20") int size
+	) {
+		return roomService.getMessagesByDate(date, page, size);
+	}
+	
+	// Lấy tin nhắn theo khoảng ngày
+	@GetMapping("/date-range/messages")
+	public ResponseEntity<?> getMessagesByDateRange(
+		@RequestParam String startDate,
+		@RequestParam String endDate,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "20") int size
+	) {
+		return roomService.getMessagesByDateRange(startDate, endDate, page, size);
+	}
+
+	// Lấy tin nhắn theo roomId và ngày
+	@GetMapping("/{roomId}/date/{date}/messages")
+	public ResponseEntity<?> getMessagesByRoomAndDate(
+		@PathVariable("roomId") String roomId,
+		@PathVariable("date") String date,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "20") int size
+	) {
+		return roomService.getMessagesByRoomAndDate(roomId, date, page, size);
+	}
+
+	// Đếm số tin nhắn theo ngày
+	@GetMapping("/date/{date}/count")
+	public ResponseEntity<?> countMessagesByDate(@PathVariable("date") String date) {
+		return roomService.countMessagesByDate(date);
+	}
+
+	// Đếm số tin nhắn theo roomId và ngày
+	@GetMapping("/{roomId}/date/{date}/count")
+	public ResponseEntity<?> countMessagesByRoomAndDate(
+		@PathVariable("roomId") String roomId,
+		@PathVariable("date") String date
+	) {
+		return roomService.countMessagesByRoomAndDate(roomId, date);
+	}
+
+	@GetMapping("/{roomId}/messages")
+	public ResponseEntity<?> getMessages(
+	    @PathVariable("roomId") String roomId,
+	    @RequestParam(defaultValue = "0") int page,
+	    @RequestParam(defaultValue = "20") int size
+	) {
+	    return roomService.getMessage(roomId, page, size);
 	}
 	
 }

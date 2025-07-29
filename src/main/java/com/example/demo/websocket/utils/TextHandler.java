@@ -17,5 +17,4 @@ public class TextHandler {
         }
         return parts; // [0] là username1, [1] là username2
     }
-	
-	}
+}
