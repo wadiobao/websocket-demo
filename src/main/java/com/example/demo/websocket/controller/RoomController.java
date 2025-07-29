@@ -32,7 +32,6 @@ public class RoomController {
 		return roomService.joinRoom(roomId);
 	}
 
-	// Lấy tin nhắn theo ngày hiện tại
 	@GetMapping("/today/messages")
 	public ResponseEntity<?> getTodayMessages(
 		@RequestParam(defaultValue = "0") int page,
@@ -41,7 +40,6 @@ public class RoomController {
 		return roomService.getTodayMessages(page, size);
 	}
 	
-	// Lấy tin nhắn theo ngày cụ thể
 	@GetMapping("/date/{date}/messages")
 	public ResponseEntity<?> getMessagesByDate(
 		@PathVariable("date") String date,
@@ -51,7 +49,6 @@ public class RoomController {
 		return roomService.getMessagesByDate(date, page, size);
 	}
 	
-	// Lấy tin nhắn theo khoảng ngày
 	@GetMapping("/date-range/messages")
 	public ResponseEntity<?> getMessagesByDateRange(
 		@RequestParam String startDate,
@@ -62,7 +59,6 @@ public class RoomController {
 		return roomService.getMessagesByDateRange(startDate, endDate, page, size);
 	}
 
-	// Lấy tin nhắn theo roomId và ngày
 	@GetMapping("/{roomId}/date/{date}/messages")
 	public ResponseEntity<?> getMessagesByRoomAndDate(
 		@PathVariable("roomId") String roomId,
@@ -73,13 +69,11 @@ public class RoomController {
 		return roomService.getMessagesByRoomAndDate(roomId, date, page, size);
 	}
 
-	// Đếm số tin nhắn theo ngày
 	@GetMapping("/date/{date}/count")
 	public ResponseEntity<?> countMessagesByDate(@PathVariable("date") String date) {
 		return roomService.countMessagesByDate(date);
 	}
 
-	// Đếm số tin nhắn theo roomId và ngày
 	@GetMapping("/{roomId}/date/{date}/count")
 	public ResponseEntity<?> countMessagesByRoomAndDate(
 		@PathVariable("roomId") String roomId,
