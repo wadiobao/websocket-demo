@@ -35,17 +35,13 @@ public class RoomService {
 		return ResponseEntity.ok().body(roomRepository.findAll());
 	}
 
-	/**
-	 * Lấy roomId theo ngày hiện tại (format: yyyy-MM-dd)
-	 */
+
 	public String getTodayRoomId() {
 		LocalDate today = LocalDate.now();
 		return today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 	}
 
-	/**
-	 * Lấy roomId theo ngày cụ thể
-	 */
+
 	public String getRoomIdByDate(LocalDate date) {
 		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 	}
@@ -87,9 +83,7 @@ public class RoomService {
 		return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST);
 	}
 
-	/**
-	 * Join phòng - tự động tạo phòng nếu chưa có
-	 */
+
 	public ResponseEntity<?> joinRoom(String roomId) {
 		Room room = roomRepository.findByRoomId(roomId).orElse(null);
 		if(room == null) {
@@ -111,34 +105,26 @@ public class RoomService {
 		return ResponseEntity.ok(messages);
 	}
 
-	/**
-	 * Lấy tin nhắn theo ngày hiện tại
-	 */
+
 	public ResponseEntity<?> getTodayMessages(int page, int size) {
 		LocalDate today = LocalDate.now();
 		return getMessagesByDate(today, page, size);
 	}
 
-	/**
-	 * Lấy tin nhắn theo ngày cụ thể
-	 */
+
 	public ResponseEntity<?> getMessagesByDate(LocalDate date, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		List<ChatMessage> messages = chatMessageRepository.findByDateOrderByTimeStampDesc(date, pageable).getContent();
 		return ResponseEntity.ok(messages);
 	}
 
-	/**
-	 * Lấy tin nhắn theo ngày (string format: yyyy-MM-dd)
-	 */
+
 	public ResponseEntity<?> getMessagesByDate(String date, int page, int size) {
 		LocalDate localDate = LocalDate.parse(date);
 		return getMessagesByDate(localDate, page, size);
 	}
 
-	/**
-	 * Lấy tin nhắn theo khoảng ngày
-	 */
+
 	public ResponseEntity<?> getMessagesByDateRange(String startDate, String endDate, int page, int size) {
 		LocalDate start = LocalDate.parse(startDate);
 		LocalDate end = LocalDate.parse(endDate);
@@ -149,9 +135,7 @@ public class RoomService {
 		return ResponseEntity.ok(messages);
 	}
 
-	/**
-	 * Lấy tin nhắn theo roomId và ngày
-	 */
+
 	public ResponseEntity<?> getMessagesByRoomAndDate(String roomId, String date, int page, int size) {
 		LocalDate localDate = LocalDate.parse(date);
 		Pageable pageable = PageRequest.of(page, size);
@@ -159,18 +143,14 @@ public class RoomService {
 		return ResponseEntity.ok(messages);
 	}
 
-	/**
-	 * Đếm số tin nhắn theo ngày
-	 */
+
 	public ResponseEntity<?> countMessagesByDate(String date) {
 		LocalDate localDate = LocalDate.parse(date);
 		long count = chatMessageRepository.countByDate(localDate);
 		return ResponseEntity.ok(count);
 	}
 
-	/**
-	 * Đếm số tin nhắn theo roomId và ngày
-	 */
+
 	public ResponseEntity<?> countMessagesByRoomAndDate(String roomId, String date) {
 		LocalDate localDate = LocalDate.parse(date);
 		long count = chatMessageRepository.countByRoomIdAndDate(roomId, localDate);
