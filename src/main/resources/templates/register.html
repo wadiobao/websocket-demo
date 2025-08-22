@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register - Library Management</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="#{button.register}">Create Account</h1>
+        
+        <div id="error-container" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email" th:text="#{label.email}">Email:</label>
+                <input type="email" id="email" name="email" required/>
+                <div id="emailError" class="field-error" th:text="#{validation.email.invalid}">Invalid email</div>
+                <div id="emailSuccess" class="field-success">Valid email</div>
+                <div class="validation-info" th:text="#{validation.email.invalid}">Email must be in a valid format (e.g., user@example.com)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" th:text="#{label.password}">Password:</label>
+                <input type="password" id="password" name="password" required/>
+                <div id="passwordError" class="field-error" th:text="#{validation.password.size}">Password is not strong enough</div>
+                <div id="passwordSuccess" class="field-success">Valid password</div>
+                <div class="password-strength">
+                    <div id="passwordStrengthBar" class="password-strength-bar"></div>
+                </div>
+                <div class="validation-info" th:text="#{validation.password.size}">Password must be at least 8 characters long, including uppercase, lowercase, numbers, and special characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword" th:text="#{label.confirmPassword}">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required/>
+                <div id="confirmPasswordError" class="field-error">Confirmation password does not match</div>
+                <div id="confirmPasswordSuccess" class="field-success">Confirmation password matches</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="name" th:text="#{label.fullName}">Full Name:</label>
+                <input type="text" id="name" name="name" required/>
+                <div id="nameError" class="field-error" th:text="#{validation.fullname.size}">Full name must have at least 2 characters</div>
+                <div id="nameSuccess" class="field-success">Valid full name</div>
+                <div class="validation-info" th:text="#{validation.fullname.pattern}">Full name must have at least 2 characters and not contain special characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address" th:text="#{label.address}">Address:</label>
+                <input type="text" id="address" name="address" required/>
+                <div id="addressError" class="field-error" th:text="#{validation.address.size}">Address must have at least 5 characters</div>
+                <div id="addressSuccess" class="field-success">Valid address</div>
+                <div class="validation-info" th:text="#{validation.address.size}">Address must have at least 5 characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone" th:text="#{label.phone}">Phone Number:</label>
+                <input type="text" id="phone" name="phone" required/>
+                <div id="phoneError" class="field-error" th:text="#{validation.phone.pattern}">Invalid phone number</div>
+                <div id="phoneSuccess" class="field-success">Valid phone number</div>
+                <div class="validation-info" th:text="#{validation.phone.pattern}">Phone number must have 10-11 digits (e.g., 0123456789)</div>
+            </div>
+            
+            <button type="submit" id="submitBtn" th:text="#{button.register}">Register</button>
+        </form>
+        
+        <div class="login-link">
+            <span th:text="#{message.have.account}">Already have an account?</span> <a href="/login" th:text="#{button.login}">Login</a>
+        </div>
+    </div>
+
+    <script src="/js/register.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+[*.java] text diff=java
+[*.xml] text eol=lf
+[*.properties] text eol=lf
+[*.md] text eol=lf
+[*.sh] text eol=lf
+[*.bat] text eol=crlf
+[*.yml] text eol=lf
+[*.yaml] text eol=lf
+[*.png] binary
+[*.jpg] binary
+[*.jpeg] binary
+[*.gif] binary

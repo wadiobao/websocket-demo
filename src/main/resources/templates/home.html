@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Home - Library Management</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Online Library</h1>
+        
+        <div class="welcome-section">
+            <h2>🎉 Welcome!</h2>
+            <p>You have successfully logged into the library management system.</p>
+        </div>
+        
+        <div class="user-info">
+            <h3>📋 Account Information</h3>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value" sec:authentication="name">user@example.com</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Role:</span>
+                <span class="info-value">Library Member</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value">Active</span>
+            </div>
+        </div>
+        
+        <div class="features-section">
+            <h3>🚀 Main Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📚 Search Books</h4>
+                    <p>Search and browse the book catalog</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📖 Borrow Books</h4>
+                    <p>Borrow books from the library</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📅 Manage Borrows</h4>
+                    <p>Track borrowed books and due dates</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⭐ Reviews</h4>
+                    <p>Rate and review books</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="logout-section">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
