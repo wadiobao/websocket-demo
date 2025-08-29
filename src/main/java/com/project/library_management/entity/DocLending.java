@@ -22,7 +22,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DocLending {
+public class DocLending extends BaseModel {
 	
 	@OneToOne(mappedBy = "docLending")
 	Document docId;

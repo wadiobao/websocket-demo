@@ -34,10 +34,10 @@ public class ApplicationInitConfig {
 				try {
 					User user = Librarian.builder()
 								.password(encoder.encode("123456"))
-								.email("admin")
+								.email("admin@gmail.com")
 								.name("Administrator")
 								.address("System Address")
-								.phone("0000000000")
+								.phone("0999999999")
 								.status(AccountStatus.ACTIVE)
 								.build();
 					

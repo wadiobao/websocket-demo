@@ -1,5 +1,7 @@
 package com.project.library_management.entity.user;
 
+import com.project.library_management.util.Constants;
+
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -10,23 +12,23 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Data
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PROTECTED)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
 public class VipMember extends Member {
 
 	@Override
 	public int getLoanLimit() {
-		return 10; 
+		return Constants.VIP_MEMBER_LOAN_LIMIT; 
 	}
 
 	@Override
 	public int getLoanDurationDays() {
-		return 30; 
+		return Constants.VIP_MEMBER_LOAN_DURATION_DAYS; 
 	}
 
 	@Override
 	public int getFinePerDay() {
-		return 500; 
+		return Constants.VIP_MEMBER_FINE_PER_DAY; 
 	}
 
 }

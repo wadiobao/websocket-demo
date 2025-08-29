@@ -24,7 +24,6 @@ public enum Language {
         return code;
     }
 
-    // Tìm Language theo code (ví dụ "vi" → VIETNAMESE)
     public static Language fromCode(String code) {
         for (Language lang : Language.values()) {
             if (lang.getCode().equalsIgnoreCase(code)) {

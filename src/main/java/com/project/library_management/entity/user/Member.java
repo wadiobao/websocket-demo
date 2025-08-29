@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PROTECTED)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
 public abstract class Member extends User {
 	LocalDate dateOfMembersip;

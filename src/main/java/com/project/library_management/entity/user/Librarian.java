@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Data
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PROTECTED)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
 public class Librarian extends User {
 

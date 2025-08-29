@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.library_management.model.BaseResponse;
+import com.project.library_management.model.UserResponse;
 import com.project.library_management.service.iservice.IUserService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class UserController {
 	final IUserService iUserService;
 	
 	@PostMapping("/infor")
-	public ResponseEntity<?> myInfor(@RequestParam String email){
+	public ResponseEntity<BaseResponse<UserResponse>> myInfor(@RequestParam String email){
 		return iUserService.myInfor(email);
 	}
 }

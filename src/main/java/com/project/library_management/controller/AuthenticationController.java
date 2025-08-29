@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.library_management.model.UserRequest;
 import com.project.library_management.service.MemberService;
@@ -32,7 +31,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/auth/reset-password")
-	public ResponseEntity<?> resetPassword(@RequestParam @NotBlank(message = "{validation.email.notblank}") 
+	public ResponseEntity<?> resetPassword(@RequestBody @NotBlank(message = "{validation.email.notblank}") 
 	                                     @Email(message = "{validation.email.invalid}") String email) {
 		log.info("Password reset request received for email: {}", email);
 		return memberService.resetPassword(email);

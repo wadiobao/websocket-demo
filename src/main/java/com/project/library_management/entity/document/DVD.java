@@ -17,9 +17,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class DVD extends Document {
 	
-	@NotBlank(message = "Duration cannot be blank")
+	@NotBlank(message = "{validation.duration.not_blank}")
 	String duration;
 	
-	@NotBlank(message = "Genre cannot be blank")
+	@NotBlank(message = "{validation.genre.not_blank}")
 	String genre;
 }

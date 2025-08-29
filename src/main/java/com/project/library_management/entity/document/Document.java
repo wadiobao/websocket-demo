@@ -30,25 +30,25 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PROTECTED)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public abstract class Document extends BaseModel {
 	
-	@NotBlank(message = "Title cannot be blank")
-    @Size(max = 255, message = "Title cannot exceed 255 characters")
+	@NotBlank(message = "{validation.title.not_blank}")
+    @Size(max = 255, message = "{validation.title.too_long}")
 	String title;
 	
-	@NotNull(message = "Publication date cannot be null")
-    @PastOrPresent(message = "Publication date cannot be in the future")
+	@NotNull(message = "{validation.publication_date.not_null}")
+    @PastOrPresent(message = "{validation.publication_date.past_or_present}")
 	LocalDate publicationDate;
 	
-	@NotNull(message = "Language cannot be null")
+	@NotNull(message = "{validation.language.not_null}")
 	Language lang;
 	
-	@NotBlank(message = "Author cannot be blank")
-    @Size(max = 255, message = "Author cannot exceed 255 characters")
+	@NotBlank(message = "{validation.author.not_blank}")
+    @Size(max = 255, message = "{validation.author.too_long}")
 	String author;
 	
 	boolean isReferenceOnly;
@@ -57,8 +57,8 @@ public abstract class Document extends BaseModel {
 	
 	LocalDateTime dueDate;
 	
-	@NotNull(message = "Price cannot be null")
-    @Min(value = 0, message = "Price cannot be negative")
+	@NotNull(message = "{validation.price.not_null}")
+    @Min(value = 0, message = "{validation.price.negative}")
 	double price;
 	
 	@ManyToOne

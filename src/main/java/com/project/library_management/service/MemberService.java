@@ -8,12 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.project.library_management.entity.user.Member;
-import com.project.library_management.entity.user.RegularMember;
-import com.project.library_management.entity.user.Student;
 import com.project.library_management.entity.user.User;
-import com.project.library_management.entity.user.VipMember;
-import com.project.library_management.enums.UserType;
+import com.project.library_management.mapper.UserMapper;
+import com.project.library_management.model.BaseResponse;
 import com.project.library_management.model.UserRequest;
 import com.project.library_management.model.UserResponse;
 import com.project.library_management.repository.UserRepository;
@@ -40,64 +37,23 @@ public class MemberService implements IUserService {
 	
 	@Override
 	@Transactional
-	public ResponseEntity<?> createUser(@Valid UserRequest userRequest) {
+	public ResponseEntity<BaseResponse<Object>> createUser(@Valid UserRequest userRequest) {
 		log.info("Creating user with email: {}", userRequest.getEmail());
 		
 		if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
 			log.warn("Email already exists: {}", userRequest.getEmail());
-			return ResponseEntity.badRequest().body(messageSource.getMessage("error.email.exists", null, LocaleContextHolder.getLocale()));
+			return ResponseEntity.badRequest().body(BaseResponse.builder().message(messageSource.getMessage("error.email.exists", null, LocaleContextHolder.getLocale())).build());
 		}
 		
-		User user = null;
 		try {
-			switch (userRequest.getUserType()) {
-			case REGULAR:
-				user = RegularMember.builder()
-						.password(encoder.encode(userRequest.getPassword()))
-						.address(userRequest.getAddress())
-						.name(userRequest.getName())
-						.email(userRequest.getEmail())
-						.phone(userRequest.getPhone())
-						.status(userRequest.getStatus())
-						.dateOfMembersip(userRequest.getDateOfMembersip())
-						.totalCheckedout(0)
-						.build();
-				break;
-				
-			case STUDENT:
-				user = Student.builder()
-						.password(encoder.encode(userRequest.getPassword()))
-						.address(userRequest.getAddress())
-						.name(userRequest.getName())
-						.email(userRequest.getEmail())
-						.phone(userRequest.getPhone())
-						.status(userRequest.getStatus())
-						.dateOfMembersip(userRequest.getDateOfMembersip())
-						.totalCheckedout(0)
-						.build();
-				break;
-				
-			case VIP:
-				user = VipMember.builder()
-						.password(encoder.encode(userRequest.getPassword()))
-						.address(userRequest.getAddress())
-						.name(userRequest.getName())
-						.email(userRequest.getEmail())
-						.phone(userRequest.getPhone())
-						.status(userRequest.getStatus())
-						.dateOfMembersip(userRequest.getDateOfMembersip())
-						.totalCheckedout(0)
-						.build();
-				break;
-			}
-			
+			User user = UserMapper.toUserEntity(userRequest, encoder);
 			userRepository.save(user);
 			log.info("User created successfully: {}", user.getEmail());
-			return ResponseEntity.ok(messageSource.getMessage("message.register.success", null, LocaleContextHolder.getLocale()));
+			return ResponseEntity.ok(BaseResponse.builder().message(messageSource.getMessage("message.register.success", null, LocaleContextHolder.getLocale())).build());
 			
 		} catch (Exception e) {
 			log.error("Error creating user: {}", e.getMessage(), e);
-			return ResponseEntity.badRequest().body(messageSource.getMessage("error.creating.account", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale()));
+			return ResponseEntity.badRequest().body(BaseResponse.builder().message(messageSource.getMessage("error.creating.account", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())).build());
 		}
 	}
 	 
@@ -132,39 +88,63 @@ public class MemberService implements IUserService {
 	
 
 	@Override
-	public ResponseEntity<?> updateUser(UserRequest userRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+	public ResponseEntity<BaseResponse<UserResponse>> updateUser(@Valid UserRequest userRequest) {
+		log.info("Updating user with email: {}", userRequest.getEmail());
+	    try {
+	        User user = userRepository.findByEmail(userRequest.getEmail())
+	                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
+
+	        UserMapper.updateUserFromRequest(userRequest, user);
+
+	        User savedUser = userRepository.save(user);
+	        log.info("User updated successfully: {}", savedUser.getEmail());
+
+			UserResponse userResponse = UserMapper.toUserResponse(savedUser);
+
+	        return ResponseEntity.ok(BaseResponse.<UserResponse>builder()
+					.message(messageSource.getMessage("message.update.success", null, LocaleContextHolder.getLocale()))
+					.data(userResponse)
+					.build());
+
+	    } catch (UsernameNotFoundException e) {
+	        log.warn("User not found for update: {}", userRequest.getEmail());
+	        return ResponseEntity.badRequest().body(BaseResponse.<UserResponse>builder().message(e.getMessage()).build());
+	    } catch (Exception e) {
+	        log.error("Error updating user: {}", e.getMessage(), e);
+	        return ResponseEntity.badRequest().body(BaseResponse.<UserResponse>builder().message(messageSource.getMessage("error.updating.user", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())).build());
+	    }
 	}
 
 	@Override
-	public ResponseEntity<?> deleteUser(UserRequest userRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+	public ResponseEntity<BaseResponse<Object>> deleteUser(@Valid UserRequest userRequest) {
+		log.info("Deleting user with email: {}", userRequest.getEmail());
+	    try {
+	        User user = userRepository.findByEmail(userRequest.getEmail())
+	                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
+
+	        userRepository.delete(user);
+	        log.info("User deleted successfully: {}", userRequest.getEmail());
+	        
+	        return ResponseEntity.ok(BaseResponse.builder().message(messageSource.getMessage("message.delete.success", null, LocaleContextHolder.getLocale())).build());
+
+	    } catch (UsernameNotFoundException e) {
+	        log.warn("User not found for deletion: {}", userRequest.getEmail());
+	        return ResponseEntity.badRequest().body(BaseResponse.builder().message(e.getMessage()).build());
+	    } catch (Exception e) {
+	        log.error("Error deleting user: {}", e.getMessage(), e);
+	        return ResponseEntity.badRequest().body(BaseResponse.builder().message(messageSource.getMessage("error.deleting.user", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())).build());
+	    }
 	}
 
 	@Override
-	public ResponseEntity<?> myInfor(@Valid String email) {
+	public ResponseEntity<BaseResponse<UserResponse>> myInfor(@Valid String email) {
 		User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-		UserType type = null;
-		if(user instanceof Student) {
-			type = UserType.STUDENT;
-		}else if(user instanceof VipMember) {
-			type = UserType.VIP;
-		}else {
-			type = UserType.REGULAR;
-		}
-		Member member = (Member) user;
-		UserResponse response = UserResponse.builder()
-				.name(user.getName())
-				.email(email)
-				.address(user.getAddress())
-				.phone(user.getPhone())
-				.dateOfMembership(member.getDateOfMembersip())
-				.type(type)
-				.build();
-		return ResponseEntity.ok(response);
+                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
+		
+		UserResponse response = UserMapper.toUserResponse(user);
+		return ResponseEntity.ok(BaseResponse.<UserResponse>builder().data(response).build());
 	}
 	
 	

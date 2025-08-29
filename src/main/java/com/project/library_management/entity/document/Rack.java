@@ -2,6 +2,7 @@ package com.project.library_management.entity.document;
 
 import java.util.List;
 
+import com.project.library_management.entity.BaseModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,10 +25,10 @@ public class Rack {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-	@NotNull(message = "Number cannot be null")
+	@NotNull(message = "{validation.rack.number.not_null}")
 	int number;
 	
-	@NotBlank(message = "Location cannot be blank")
+	@NotBlank(message = "{validation.rack.location.not_blank}")
 	String location;
 	
 	@OneToMany(mappedBy = "rack")

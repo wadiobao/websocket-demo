@@ -18,11 +18,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Magazine extends Document {
 	
-	@NotNull(message = "Issue number cannot be null")
-	@Min(value = 1, message = "Issue number must be greater than 0")
+	@NotNull(message = "{validation.issue_number.not_null}")
+	@Min(value = 1, message = "{validation.issue_number.min}")
 	int issueNumber;
 	
-	@NotNull(message = "Publication frequency cannot be null")
-	@Min(value = 1, message = "Publication frequency must be greater than 0")
+	@NotNull(message = "{validation.pub_frequency.not_null}")
+	@Min(value = 1, message = "{validation.pub_frequency.min}")
 	int pubFrequency;
 }

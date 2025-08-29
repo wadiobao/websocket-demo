@@ -5,6 +5,7 @@ import java.util.List;
 import com.project.library_management.entity.BaseModel;
 import com.project.library_management.entity.DocLending;
 import com.project.library_management.enums.AccountStatus;
+import com.project.library_management.util.Constants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +28,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PROTECTED)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -38,7 +39,7 @@ public class User extends BaseModel{
 	String password;
 	
 	@NotBlank(message = "{validation.fullname.notblank}")
-	@Pattern(regexp = "^[a-zA-ZÀ-ỹ\\s]+$", message = "{validation.fullname.pattern}")
+	@Pattern(regexp = Constants.FULLNAME_PATTERN, message = "{validation.fullname.pattern}")
 	String name;
 	
 	@NotBlank(message = "{validation.address.notblank}")
@@ -50,7 +51,7 @@ public class User extends BaseModel{
 	String email;
 	
 	@NotBlank(message = "{validation.phone.notblank}")
-	@Pattern(regexp = "^[0-9]{10,11}$", message = "{validation.phone.pattern}")
+	@Pattern(regexp = Constants.PHONE_PATTERN, message = "{validation.phone.pattern}")
 	String phone;
 	
 	AccountStatus status;
@@ -60,7 +61,7 @@ public class User extends BaseModel{
 	
 	public boolean resetPassword() {
 		if (this.status == AccountStatus.ACTIVE) {
-			this.password = "123456789Z@";
+			this.password = Constants.DEFAULT_PASSWORD;
 			return true;
 		}
 		return false;

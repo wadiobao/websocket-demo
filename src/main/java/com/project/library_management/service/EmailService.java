@@ -32,8 +32,6 @@ public class EmailService {
 			scheduleExpiry(email, 3, TimeUnit.MINUTES);
 		} catch (Exception e) {
 			log.error("Failed to send password reset email to: {}", email, e);
-			// Don't throw exception, just log the error
-			// This allows the password reset to succeed even if email fails
 		}
 	}
 	
