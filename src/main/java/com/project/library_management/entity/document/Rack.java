@@ -21,10 +21,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Rack {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+public class Rack extends BaseModel{
+	
 	@NotNull(message = "{validation.rack.number.not_null}")
 	int number;
 	
