@@ -20,4 +20,5 @@ public class UserResponse {
 	String phone;
 	LocalDate dateOfMembership;
 	UserType type;
+	double fine;
 }

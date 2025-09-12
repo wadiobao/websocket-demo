@@ -13,16 +13,19 @@ import com.project.library_management.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller 
 @RequiredArgsConstructor
 @Slf4j
 @Validated
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
 
-	private final MemberService memberService;
+	MemberService memberService;
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody UserRequest userRequest) {

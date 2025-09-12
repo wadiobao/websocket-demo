@@ -1,9 +1,12 @@
 package com.project.library_management.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,6 @@ import com.project.library_management.entity.document.Rack;
 import com.project.library_management.entity.user.Member;
 import com.project.library_management.enums.ErrorCode;
 import com.project.library_management.exception.MyException;
-import com.project.library_management.mapper.DocumentMapper;
 import com.project.library_management.model.BaseResponse;
 import com.project.library_management.model.DocumentRequest;
 import com.project.library_management.model.DocumentResponse;
@@ -22,32 +24,39 @@ import com.project.library_management.repository.DocLendingRepository;
 import com.project.library_management.repository.DocumentRepository;
 import com.project.library_management.repository.RackRepository;
 import com.project.library_management.repository.UserRepository;
+import com.project.library_management.service.iservice.IDocumentMapper;
 import com.project.library_management.service.iservice.IDocumentService;
+import com.project.library_management.service.iservice.ISearchService;
+import com.project.library_management.specification.DocumentSpecification;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-public class DocumentService implements IDocumentService {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class DocumentService implements IDocumentService, ISearchService {
 
-    private final DocumentRepository documentRepository;
-    private final RackRepository rackRepository;
-    private final UserRepository userRepository;
-    private final DocLendingRepository docLendingRepository;
-    private final MessageSource messageSource;
+    DocumentRepository documentRepository;
+    RackRepository rackRepository;
+    UserRepository userRepository;
+    DocLendingRepository docLendingRepository;
+    MessageSource messageSource;
+    IDocumentMapper documentMapper;
 
     @Override
     @Transactional
     public ResponseEntity<BaseResponse<DocumentResponse>> createDocument(@Valid DocumentRequest request) {
         Rack rack = rackRepository.findById(request.getRackId())
                 .orElseThrow(() -> new MyException(ErrorCode.RACK_NOT_FOUND));
-        Document document = DocumentMapper.toDocumentEntity(request);
+        Document document = documentMapper.toDocumentEntity(request);
         document.setRack(rack);
         Document savedDocument = documentRepository.save(document);
         return ResponseEntity.ok(BaseResponse.<DocumentResponse>builder()
-                .data(DocumentMapper.toDocumentResponse(savedDocument))
+                .data(documentMapper.toDocumentResponse(savedDocument))
                 .message(messageSource.getMessage("message.document.created.success", null, LocaleContextHolder.getLocale()))
                 .build());
     }
@@ -63,7 +72,7 @@ public class DocumentService implements IDocumentService {
         document.setAuthor(request.getAuthor());
         Document savedDocument = documentRepository.save(document);
         return ResponseEntity.ok(BaseResponse.<DocumentResponse>builder()
-                .data(DocumentMapper.toDocumentResponse(savedDocument))
+                .data(documentMapper.toDocumentResponse(savedDocument))
                 .message(messageSource.getMessage("message.document.updated.success", null, LocaleContextHolder.getLocale()))
                 .build());
     }
@@ -127,8 +136,12 @@ public class DocumentService implements IDocumentService {
         Document document = docLending.getDocId();
         Member member = (Member) docLending.getUserId();
 
-        // Fine calculation logic can be added here
-        // member.checkForFine();
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(docLending.getDueDate())) {
+            long daysLate = java.time.temporal.ChronoUnit.DAYS.between(docLending.getDueDate(), now);
+            double fine = daysLate * member.getFinePerDay();
+            member.addFine(fine);
+        }
 
         document.setBorrowed(false);
         document.setDueDate(null);
@@ -140,5 +153,17 @@ public class DocumentService implements IDocumentService {
         userRepository.save(member);
 
         return ResponseEntity.ok(BaseResponse.builder().message(messageSource.getMessage("message.document.returned.success", null, LocaleContextHolder.getLocale())).build());
+    }
+
+    @Override
+    public ResponseEntity<BaseResponse<List<DocumentResponse>>> searchDocuments(String title, String author, String type) {
+        Specification<Document> spec = DocumentSpecification.findByCriteria(title, author, type);
+        List<Document> documents = documentRepository.findAll(spec);
+
+        List<DocumentResponse> documentResponses = documents.stream()
+                .map(documentMapper::toDocumentResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(BaseResponse.<List<DocumentResponse>>builder().data(documentResponses).build());
     }
 }

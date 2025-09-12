@@ -23,6 +23,19 @@ import lombok.experimental.SuperBuilder;
 public abstract class Member extends User {
 	LocalDate dateOfMembersip;
 	int totalCheckedout;
+	double fine;
+	
+	public void addFine(double amount) {
+		this.fine += amount;
+	}
+	
+	public void payFine(double amount) {
+		if (amount > this.fine) {
+			this.fine = 0;
+		} else {
+			this.fine -= amount;
+		}
+	}
 	
 	public void incrementTotalCheckedout() {
 		if (totalCheckedout < getLoanLimit()) {
@@ -39,17 +52,6 @@ public abstract class Member extends User {
 	public void returnDocItem()	{
 		if (totalCheckedout > 0) {
 			totalCheckedout--;
-		}
-	}
-	
-	public void checkForFine() {
-		if (totalCheckedout > 0) {
-			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime dueDate = now.plusDays(getLoanDurationDays());
-			if (now.isAfter(dueDate)) {
-				long daysLate = ChronoUnit.DAYS.between(dueDate, now);
-				int fineAmount = (int) (daysLate * getFinePerDay());
-			}
 		}
 	}
 	

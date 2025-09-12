@@ -15,7 +15,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import com.project.library_management.enums.ErrorCode;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MyExceptionHandler {
 
-	private final MessageSource messageSource;
+	MessageSource messageSource;
 
 	@ExceptionHandler(value = MyException.class)
 	ResponseEntity<?> handlingException(MyException exception) {

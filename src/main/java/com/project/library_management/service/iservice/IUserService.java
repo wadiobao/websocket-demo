@@ -14,5 +14,6 @@ public interface IUserService {
 	public ResponseEntity<BaseResponse<Object>> deleteUser(@Valid UserRequest userRequest);
 	public ResponseEntity<?> resetPassword(@Valid String email);
 	public ResponseEntity<BaseResponse<UserResponse>> myInfor(@Valid String email);
+	public ResponseEntity<BaseResponse<Object>> payFine(@Valid String email, double amount);
 	
 }

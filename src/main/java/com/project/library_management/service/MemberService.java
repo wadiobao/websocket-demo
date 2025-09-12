@@ -8,12 +8,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import com.project.library_management.entity.user.Member;
 import com.project.library_management.entity.user.User;
-import com.project.library_management.mapper.UserMapper;
 import com.project.library_management.model.BaseResponse;
 import com.project.library_management.model.UserRequest;
 import com.project.library_management.model.UserResponse;
 import com.project.library_management.repository.UserRepository;
+import com.project.library_management.service.iservice.IUserMapper;
 import com.project.library_management.service.iservice.IUserService;
 
 import jakarta.transaction.Transactional;
@@ -30,10 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @Validated
 public class MemberService implements IUserService {
 	
-	final EmailService emailService;
-	final UserRepository userRepository;
-	final PasswordEncoder encoder;
-	final MessageSource messageSource;
+	EmailService emailService;
+	UserRepository userRepository;
+	PasswordEncoder encoder;
+	MessageSource messageSource;
+	IUserMapper userMapper;
 	
 	@Override
 	@Transactional
@@ -46,7 +48,7 @@ public class MemberService implements IUserService {
 		}
 		
 		try {
-			User user = UserMapper.toUserEntity(userRequest, encoder);
+			User user = userMapper.toUserEntity(userRequest, encoder);
 			userRepository.save(user);
 			log.info("User created successfully: {}", user.getEmail());
 			return ResponseEntity.ok(BaseResponse.builder().message(messageSource.getMessage("message.register.success", null, LocaleContextHolder.getLocale())).build());
@@ -95,12 +97,12 @@ public class MemberService implements IUserService {
 	        User user = userRepository.findByEmail(userRequest.getEmail())
 	                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
 
-	        UserMapper.updateUserFromRequest(userRequest, user);
+	        userMapper.updateUserFromRequest(userRequest, user);
 
 	        User savedUser = userRepository.save(user);
 	        log.info("User updated successfully: {}", savedUser.getEmail());
 
-			UserResponse userResponse = UserMapper.toUserResponse(savedUser);
+			UserResponse userResponse = userMapper.toUserResponse(savedUser);
 
 	        return ResponseEntity.ok(BaseResponse.<UserResponse>builder()
 					.message(messageSource.getMessage("message.update.success", null, LocaleContextHolder.getLocale()))
@@ -143,8 +145,36 @@ public class MemberService implements IUserService {
 		User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
 		
-		UserResponse response = UserMapper.toUserResponse(user);
+		UserResponse response = userMapper.toUserResponse(user);
 		return ResponseEntity.ok(BaseResponse.<UserResponse>builder().data(response).build());
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<BaseResponse<Object>> payFine(@Valid String email, double amount) {
+		log.info("Paying fine for user with email: {}", email);
+		try {
+			User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage("error.user.not.found", null, LocaleContextHolder.getLocale())));
+
+			if (user instanceof Member) {
+				Member member = (Member) user;
+				member.payFine(amount);
+				userRepository.save(member);
+				log.info("Fine paid successfully for user: {}", email);
+				return ResponseEntity.ok(BaseResponse.builder().message(messageSource.getMessage("message.fine.paid.success", null, LocaleContextHolder.getLocale())).build());
+			} else {
+				log.warn("User is not a member: {}", email);
+				return ResponseEntity.badRequest().body(BaseResponse.builder().message(messageSource.getMessage("error.user.not.member", null, LocaleContextHolder.getLocale())).build());
+			}
+
+		} catch (UsernameNotFoundException e) {
+			log.warn("User not found for fine payment: {}", email);
+			return ResponseEntity.badRequest().body(BaseResponse.builder().message(e.getMessage()).build());
+		} catch (Exception e) {
+			log.error("Error paying fine for user: {}", e.getMessage(), e);
+			return ResponseEntity.badRequest().body(BaseResponse.builder().message(messageSource.getMessage("error.paying.fine", new Object[]{e.getMessage()}, LocaleContextHolder.getLocale())).build());
+		}
 	}
 	
 	
